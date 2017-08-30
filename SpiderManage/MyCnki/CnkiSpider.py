@@ -14,16 +14,16 @@ class Spider():
     爬虫初始化
     '''
 
-    def __init__(self):
+    def __init__(self, search_value, db_name, collection_name, db_host='127.0.0.1', db_port=27017,cache_host='127.0.0.1',cache_port=6379):
 
         # 配置参数
-        self.search_value = '无轨电车'  # 搜索关键词
-        dbHost = '127.0.0.1'  # 数据库地址
-        dbPort = 27017  # 数据库端口
-        dbName = 'Cnki'  # 数据库名称
-        collectionName = 'CnkiData1'  # 数据表名称
-        cache_host = '127.0.0.1'  # redis地址
-        cache_port = 6379  # redis端口
+        self.search_value = search_value  # 搜索关键词
+        dbHost = db_host  # 数据库地址
+        dbPort = db_port  # 数据库端口
+        dbName = db_name  # 数据库名称
+        collectionName = collection_name  # 数据表名称
+        cacheHost = cache_host  # redis地址
+        cachePort = cache_port  # redis端口
 
         # 初始化应用
         print '----初始化爬虫属性----'
@@ -46,7 +46,7 @@ class Spider():
         self.yanzheng()
 
         # Redis连接池
-        self.pool = redis.ConnectionPool(host=cache_host, port=cache_port)
+        self.pool = redis.ConnectionPool(host=cacheHost, port=cachePort)
         # r = redis.Redis(connection_pool=self.pool)
 
     def quchu(self, str):
