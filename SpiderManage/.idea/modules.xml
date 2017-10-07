@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/SpiderManage.iml" filepath="$PROJECT_DIR$/.idea/SpiderManage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../UserManage/.idea/UserManage.iml" filepath="$PROJECT_DIR$/../UserManage/.idea/UserManage.iml" />
     </modules>
   </component>
 </project>
