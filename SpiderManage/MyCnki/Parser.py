@@ -11,7 +11,7 @@ class HtmlParser(Singleton.singleton):
     def __init__(self):
         pass
 
-    def parser(self,body):
+    def parser(self,body,conn):
         select = bs4.BeautifulSoup(body['html'],'lxml')
         table = select.find('table',{'class':'GridTableContent'})
         next_node = select.find('a',{'id':'Page_next'})
@@ -20,13 +20,13 @@ class HtmlParser(Singleton.singleton):
             return {'flag':'auth'}
         elif table != None and next_node == None:
             #结束了
-            self.parser_list(select)
+            self.parser_list(select,conn)
             return {'flag':'end'}
         else:
-            return {'flag':'pass','next_url':self.parser_list(select)}
+            return {'flag':'pass','next_url':self.parser_list(select,conn)}
 
 
-    def parser_list(self,select):
+    def parser_list(self,select,conn):
         table = select.find_all('table', {'class': 'GridTableContent'})
         trs = table[0].find_all('tr')
         item = {}
@@ -39,14 +39,14 @@ class HtmlParser(Singleton.singleton):
             item['downcount'] = tds[7].get_text().strip()
             item['url'] = tds[1].find_all('a')[0].attrs['href']
             item['url'] = 'http://kns.cnki.net/KCMS' + item['url'][-len(item['url']) + 4:]
-            self.parser_content({'item':item,'html':download().down(item['url'],urllib2.build_opener())})
+            self.parser_content({'item':item,'html':download().down(item['url'],urllib2.build_opener())},conn)
         next_node = select.find('a', {'id': 'Page_next'})
         if next_node:
             return 'http://kns.cnki.net/kns/brief/brief.aspx' + next_node['href']
         else:
             return None
 
-    def parser_content(self,body):
+    def parser_content(self,body,conn):
         item = body['item']
         # for a in item:
         #     print '%s:%s'%(a,item[a])
@@ -93,4 +93,4 @@ class HtmlParser(Singleton.singleton):
         if '_id' in item:
             del(item['_id'])
         print item['title']
-        save().insert(item)
+        conn.insert(item)

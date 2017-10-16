@@ -33,10 +33,16 @@ class DBConn(Singleton.singleton):
         return keyword_dict
 
 
-    def find_keyword(self,keyword_dict):
-        post = self.tdb[keyword_dict['table']]
+    def find_keyword(self,keyword,pageIndex=0,pageSize=10):
+        table = self.find_tableid(keyword)
+        if not table:
+            return False
+        post = self.tdb['cnki'+ str(table)]
         article_list = []
-        for article in post.find():
+        for article in post.find().skip(pageIndex).limit(pageSize):
+            if "_id" in article:
+                del (article['_id'])
+            article['desc'] = article['ChDivSummary'][0:130] + '...'
             article_list.append(article)
         return article_list
 
@@ -45,8 +51,19 @@ class DBConn(Singleton.singleton):
         post = self.tdb['cnki_keyword']
         row = post.find_one({'keyword':keyword})
         if row == None:
-            post.insert({'keyword': keyword, 'stats': '2', 'rand_table': str(int(time.time()))})
+            post.insert({'keyword': keyword, 'stats': '0', 'rand_table': str(int(time.time()))})
             return True
+        else:
+            return False
+
+    def find_tableid(self,search_value):
+        post = self.tdb['cnki_keyword']
+        row = post.find_one({'keyword': search_value})
+        if row:
+            if row['stats'] == "1":
+                return row['rand_table']
+            else:
+                return False
         else:
             return False
 
@@ -54,4 +71,8 @@ if __name__ == "__main__":
 
     a = DBConn()
     a.conn()
-    print a.find_cache(u'电网')
+    b = a.find_keyword(u'大数据',0,10)
+    for i in b:
+        if "_id" in i:
+            del(i['_id'])
+        print i

@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+<title>知网搜搜</title>
+
+<script type="text/javascript" src="/static/comonjs/jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="/static/comonjs/modernizr-2.6.2.min.js"></script>
+<script type="text/javascript" src="/static/js/starbg.js"></script>
+
+<link type="text/css" rel="stylesheet" href="/static/css/styles.css" />
+<style>
+	*{ margin:0; padding:0;}
+	canvas{ display: block; margin: 0; width:100%; height:100%; position: fixed; left: 0; right: 0; top:0; bottom:0;
+		z-index: -1; }
+	.content{ width: 1144px; margin: 0 auto; padding-top:200px;}
+	.rabitBg{ position:fixed; left:0; top:50%;}
+</style>
+
+</head>
+<body>
+<canvas id="fullstarbg">你的浏览器不支持canvas标签</canvas>
+<div class="content">
+ <img src="/static/rabit.png" class="rabitBg" />
+ <div class="input_wrap_box box_S">
+	 <div class="input_cover">
+		 <span class="num">输入知网关键字</span>
+		 <span class="icons">回车搜索</span>
+	 </div>
+	 <input type="text" id="sercHead" class="box_S">
+ </div>
+</div>
+<script>
+	function add_keyword(val) {
+	    $.post("/insert_keyword",{"keyword":val},function (data,status) {
+	        alert(data.msg);
+        });
+    }
+   $(".input_cover").mousedown(function(){
+	   $(this).hide();
+	   $(this).siblings("input").addClass("cur");
+	   $("#sercHead").focus();
+	   return false;
+
+   })
+   $("#sercHead").blur(function(){
+	   $(this).removeClass("cur");
+	   if($(this).val()==''){
+		   $(this).siblings(".input_cover").show();
+	   }
+   })
+
+	$('#sercHead').bind('keypress',function(event){
+         if(event.keyCode == "13")
+         {
+             $.get("./search?keyword="+$(this).val(),function (data,status) {
+				 if(data.msg == "false"){
+				     anwser = confirm("未查询到相关记录!\n是否将关键词["+$('#sercHead').val()+"]加入待爬取列表?")
+					 if(anwser)
+					 {
+					     add_keyword($('#sercHead').val());
+					 }
+				 }else if(data.msg == "true"){
+					window.location.href='/list?keyword='+$('#sercHead').val();
+				 }
+             });
+         }
+
+     });
+</script>
+
+<div style="text-align:center;margin:50px 0; font:normal 14px/24px 'MicroSoft YaHei';">
+
+</div>
+</body>
+</html>
